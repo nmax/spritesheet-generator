@@ -1,0 +1,12 @@
+[package]
+name = "sprite-generator"
+version = "0.1.0"
+authors = ["Maximilian Neger <maximilian.neger@gmail.com>"]
+
+[dependencies]
+toml = "0.1.30"
+clippy = "0.0.77"
+clap = "2.9.2"
+image = "0.10.1"
+handlebars = "0.18.1"
+rustc-serialize = "0.3.19"

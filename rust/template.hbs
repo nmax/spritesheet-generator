@@ -1,0 +1,19 @@
+$__{{spritesheet_name}}: (
+  {{#each sprites~}}
+    {{name}}: (
+      width: {{bounds.width}},
+      height: {{bounds.height}},
+      x: {{bounds.x}},
+      y: {{bounds.y}}
+    ),
+  {{/each~}}
+);
+
+@mixin {{spritesheet_name}}-sprite($sprite) {
+  background-image: url({{spritesheet_name}}.png);
+  $__sprite: map-get($__{{spritesheet_name}}, $sprite);
+  width: map-get($__sprite, width);
+  height: map-get($__sprite, width);
+
+  background-position: -map-get($__sprite, x), -map-get($__sprite, y);
+}
