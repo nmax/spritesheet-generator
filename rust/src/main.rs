@@ -1,9 +1,10 @@
-mod importer;
-mod sprite_sheet;
-mod sprite;
-mod size;
-mod template_generator;
+mod bounding_rect;
 mod errors;
+mod importer;
+mod size;
+mod sprite;
+mod sprite_sheet;
+mod template_generator;
 
 use sprite_sheet::SpriteSheet;
 

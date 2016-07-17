@@ -9,31 +9,13 @@ use self::image::{GenericImage, DynamicImage};
 use self::rustc_serialize::json::{Json, ToJson};
 use size::Size;
 use errors::SpriteSheetError;
-
-#[derive(Clone, Debug)]
-pub struct BoundingRect {
-  pub x: u32,
-  pub y: u32,
-  pub width: u32,
-  pub height: u32,
-}
+use bounding_rect::BoundingRect;
 
 #[derive(Clone)]
 pub struct Sprite {
   path: PathBuf,
   pub buffer: DynamicImage,
   bounds: Option<BoundingRect>,
-}
-
-impl ToJson for BoundingRect {
-  fn to_json(&self) -> Json {
-    let mut m: BTreeMap<String, Json> = BTreeMap::new();
-    m.insert("x".to_owned(), self.x.to_json());
-    m.insert("y".to_owned(), self.y.to_json());
-    m.insert("width".to_owned(), self.width.to_json());
-    m.insert("height".to_owned(), self.height.to_json());
-    m.to_json()
-  }
 }
 
 impl ToJson for Sprite {

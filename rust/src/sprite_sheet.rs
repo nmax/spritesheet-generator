@@ -11,7 +11,8 @@ use std::collections::BTreeMap;
 use errors::SpriteSheetError;
 use template_generator;
 use size::Size;
-use sprite::{Sprite, BoundingRect};
+use sprite::Sprite;
+use bounding_rect::BoundingRect;
 
 pub struct SpriteSheet {
   name: String,
