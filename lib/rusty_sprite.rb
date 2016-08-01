@@ -1,19 +1,22 @@
+require 'sprockets'
+require 'tilt'
+
 require 'rusty_sprite/version'
+require 'rusty_sprite/sprockets/transformer'
+
+require 'rusty_sprite/engine' if defined?(::Rails::Engine)
 
 module RustySprite
-  class Generator
-    def self.call(name, files, scss_out, img_out)
-      bin = "#{File.dirname(__FILE__)}/../rust/target/release/sprite-generator"
-      absolute_files_paths =
-        files.map { |path| File.absolute_path(path) }.join(' ')
+end
+class SpriteDings < Tilt::Template
+  def prepare
+  end
 
-      require 'pry'
-      binding.pry
-      system(bin,
-             '--name', name,
-             '--scss-out', scss_out,
-             '--image-out', img_out,
-             absolute_files_paths)
-    end
+  def evaluate context, _
+    "$fsize: 26px; body.svenhuhu { font-size: $fsize; };"
   end
 end
+
+
+# ::Sprockets.register_mime_type 'text/css', extensions: ['.css.sprite']
+::Sprockets.register_engine '.sprite', SpriteDings
