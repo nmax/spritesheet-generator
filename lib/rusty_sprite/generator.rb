@@ -1,5 +1,7 @@
+# encoding: utf-8
 module RustySprite
   class Generator
+    # TODO: Das könnte auch ein ffi Aufruf werden.
     def self.call(name, files, scss_out, img_out)
       bin = "#{File.dirname(__FILE__)}/../rust/target/release/sprite-generator"
       absolute_files_paths =
