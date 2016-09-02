@@ -3,15 +3,14 @@ module RustySprite
   class Generator
     # TODO: Das könnte auch ein ffi Aufruf werden.
     def self.call(name, files, scss_out, img_out)
-      bin = "#{File.dirname(__FILE__)}/../rust/target/release/sprite-generator"
-      absolute_files_paths =
-        files.map { |path| File.absolute_path(path) }.join(' ')
+      bin =
+        "#{File.dirname(__FILE__)}/../../rust/target/release/sprite-generator"
 
       system(bin,
              '--name', name,
-             '--scss-out', scss_out,
-             '--image-out', img_out,
-             absolute_files_paths)
+             '--scss-out', File.absolute_path(scss_out),
+             '--image-out', File.absolute_path(img_out),
+             files.map { |path| File.absolute_path(path) }.join(' '))
     end
   end
 end

@@ -14,6 +14,8 @@ pub fn render_scss<P: AsRef<Path>>(sheet: &SpriteSheet,
   let data = Context::wraps(&sheet.data());
   let mut out_file = try!(File::create(out_file));
 
+  println!("sheet written to {:?}", out_file);
+
   try!(handlebars.template_renderw(template, &data, &mut out_file));
   Ok(())
 }

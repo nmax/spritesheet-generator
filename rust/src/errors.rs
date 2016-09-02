@@ -36,9 +36,9 @@ impl error::Error for SpriteSheetError {
 
   fn cause(&self) -> Option<&error::Error> {
     match *self {
-      SpriteSheetError::Io(ref err) => Some(err),
-      SpriteSheetError::TemplateRender(ref err) => Some(err),
-      SpriteSheetError::Image(ref err) => Some(err),
+      SpriteSheetError::Io(ref err) => err.cause(),
+      SpriteSheetError::TemplateRender(ref err) => err.cause(),
+      SpriteSheetError::Image(ref err) => err.cause(),
     }
   }
 }

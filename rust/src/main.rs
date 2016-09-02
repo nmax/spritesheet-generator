@@ -20,6 +20,9 @@ fn optional_with_default(matches: &ArgMatches,
     .unwrap_or(String::from(default))
 }
 
+// TODO: Verbose Flag mit Logging
+// TODO: Args als Enums/Static Strings?
+// TODO: Config als Toml File?
 fn main() {
   let matches = App::new("SpriteSheetGenerator")
     .version("1.0")
@@ -49,10 +52,12 @@ fn main() {
     .get_matches();
 
   let out_png =
-    optional_with_default(&matches, "output_png", "spritesheet.png");
+    optional_with_default(&matches, "output_img", "spritesheet.png");
   let out_scss =
     optional_with_default(&matches, "output_scss", "spritesheet.scss");
   let name = optional_with_default(&matches, "name", "spritesheet");
+
+  println!("[rust] {:?}", out_png);
 
   // unwrap ist hier sicher weil "input" ein required-Attribut ist
   let files: Vec<&str> = matches.values_of("input").unwrap().collect();
@@ -65,7 +70,7 @@ fn main() {
   let sheet = SpriteSheet::new(sprites, &name);
 
   match sheet.save(out_png, out_scss) {
-    Err(or) => println!("{}", or),
+    Err(err) => println!("{}", err),
     Ok(()) => (),
   }
 }
