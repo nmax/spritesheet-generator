@@ -57,10 +57,13 @@ fn main() {
     optional_with_default(&matches, "output_scss", "spritesheet.scss");
   let name = optional_with_default(&matches, "name", "spritesheet");
 
-  println!("[rust] {:?}", out_png);
 
   // unwrap ist hier sicher weil "input" ein required-Attribut ist
   let files: Vec<&str> = matches.values_of("input").unwrap().collect();
+
+  println!("[rust] outpng = {:?}", out_png);
+  println!("[rust] outscss = {:?}", out_scss);
+  println!("[rust] files = {:?}", files);
 
   let sprites = importer::load_files(files).unwrap_or_else(|error| {
     println!("{}", error);

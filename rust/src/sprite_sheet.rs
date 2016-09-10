@@ -50,7 +50,6 @@ impl SpriteSheet {
     try!(template_generator::render_scss(self, &out_scss));
 
     let mut buffer = try!(File::create(&out_png));
-    println!("buffer file {:?}", buffer);
     try!(self.canvas.save(&mut buffer, image::ImageFormat::PNG));
     Ok(())
   }
