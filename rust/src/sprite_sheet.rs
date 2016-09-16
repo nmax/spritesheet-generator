@@ -23,23 +23,21 @@ pub struct SpriteSheet {
 impl SpriteSheet {
   // TODO: Kann das weniger machen? Lieber ein kleineres Struct und dickere
   // Methoden?
-  pub fn new(sprites: Vec<Sprite>, name: &str) -> Self {
+  pub fn new(mut sprites: Vec<Sprite>, name: &str) -> Self {
     let (width, height) = compute_min_spritesheet_size(sprites.clone());
     let mut canvas = DynamicImage::new_rgba8(width, height);
     let mut offset: u32 = 0;
-    let sprites_with_bounds = sprites.into_iter()
-      .map(|mut sprite| {
-        let bounds = place_image(sprite.clone(), &mut canvas, offset);
-        sprite.add_bounds(bounds);
-        offset += sprite.dimensions().1 + 1;
-        sprite
-      })
-      .collect();
+
+    for sprite in &mut sprites {
+      let bounds = place_image(sprite, &mut canvas, offset);
+      sprite.add_bounds(bounds);
+      offset += sprite.dimensions().1 + 1;
+    }
 
     SpriteSheet {
       name: name.to_owned(),
-      sprites: sprites_with_bounds,
       canvas: canvas,
+      sprites: sprites,
     }
   }
 
@@ -62,7 +60,7 @@ impl SpriteSheet {
   }
 }
 
-fn place_image(sprite: Sprite,
+fn place_image(sprite: &Sprite,
                buffer: &mut DynamicImage,
                offset: u32)
                -> BoundingRect {

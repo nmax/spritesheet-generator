@@ -68,6 +68,7 @@ impl Sprite {
     self.bounds = Some(bounds);
   }
 
+  // TODO: Das sollte vermutlich "-> Result<String, SpritesheetError>" werden.
   pub fn css_class_name(&self) -> String {
     self.path
       .file_stem()
