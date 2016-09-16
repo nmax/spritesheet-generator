@@ -49,6 +49,11 @@ fn main() {
              and the like.")
       .required(false)
       .takes_value(true))
+    .arg(Arg::with_name("verbose")
+      .short("v")
+      .help("Be more vocal about whats happening")
+      .required(false)
+      .takes_value(false))
     .get_matches();
 
   let out_png =
@@ -60,17 +65,21 @@ fn main() {
 
   // unwrap ist hier sicher weil "input" ein required-Attribut ist
   let files: Vec<&str> = matches.values_of("input").unwrap().collect();
+  let be_verbose = matches.value_of("verbose").is_some();
 
-  println!("[rust] outpng = {:?}", out_png);
-  println!("[rust] outscss = {:?}", out_scss);
-  println!("[rust] files = {:?}", files);
+  // TODO: Mehr benutzen / Richtigen Logger benutzen
+  if be_verbose {
+    println!("[rust] outpng={:?}", out_png);
+    println!("[rust] outscss={:?}", out_scss);
+    println!("[rust] files={:?}", files);
+  }
 
   let sprites = importer::load_files(files).unwrap_or_else(|error| {
     println!("{}", error);
     std::process::exit(1)
   });
 
-  let sheet = SpriteSheet::new(sprites, &name);
+  let sheet = SpriteSheet::new(sprites, &name, be_verbose);
 
   match sheet.save(out_png, out_scss) {
     Err(err) => println!("{}", err),

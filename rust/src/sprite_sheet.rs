@@ -18,12 +18,13 @@ pub struct SpriteSheet {
   name: String,
   canvas: DynamicImage,
   sprites: Vec<Sprite>,
+  be_verbose: bool,
 }
 
 impl SpriteSheet {
   // TODO: Kann das weniger machen? Lieber ein kleineres Struct und dickere
   // Methoden?
-  pub fn new(mut sprites: Vec<Sprite>, name: &str) -> Self {
+  pub fn new(mut sprites: Vec<Sprite>, name: &str, be_verbose: bool) -> Self {
     let (width, height) = compute_min_spritesheet_size(sprites.clone());
     let mut canvas = DynamicImage::new_rgba8(width, height);
     let mut offset: u32 = 0;
@@ -38,6 +39,7 @@ impl SpriteSheet {
       name: name.to_owned(),
       canvas: canvas,
       sprites: sprites,
+      be_verbose: be_verbose,
     }
   }
 
@@ -45,7 +47,7 @@ impl SpriteSheet {
                               out_png: P,
                               out_scss: P)
                               -> Result<(), SpriteSheetError> {
-    try!(template_generator::render_scss(self, &out_scss));
+    try!(template_generator::render_scss(self, &out_scss, &out_png));
 
     let mut buffer = try!(File::create(&out_png));
     try!(self.canvas.save(&mut buffer, image::ImageFormat::PNG));
