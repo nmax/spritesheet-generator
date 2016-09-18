@@ -21,3 +21,14 @@ impl ToJson for BoundingRect {
     m.to_json()
   }
 }
+
+impl BoundingRect {
+  pub fn new(x: u32, y: u32, width: u32, height: u32) -> Self {
+    BoundingRect {
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+    }
+  }
+}
