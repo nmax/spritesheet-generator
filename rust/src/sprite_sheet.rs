@@ -70,12 +70,7 @@ fn place_image(sprite: &Sprite,
   let mut sub_image = imageops::crop(buffer, 0, offset, width, height);
   sub_image.copy_from(&sprite.buffer, 0, 0);
 
-  BoundingRect {
-    x: 0,
-    y: offset,
-    width: width,
-    height: height,
-  }
+  BoundingRect::new(0, offset, width, height)
 }
 
 fn compute_min_spritesheet_size(sprites: Vec<Sprite>) -> Size {
