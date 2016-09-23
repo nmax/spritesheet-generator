@@ -9,22 +9,22 @@ $__{{spritesheet_name}}: (
   {{/each~}}
 );
 
-// TODO: @function um ein Sprite aus der Map zu holen.
+@function {{spritesheet_name}}_sprite_height($sprite) {
+  $__sprite: map-get($__{{spritesheet_name}}, $sprite);
+  @return map-get($__sprite, height);
+}
+
+@function {{spritesheet_name}}_sprite_width($sprite) {
+  $__sprite: map-get($__{{spritesheet_name}}, $sprite);
+  @return map-get($__sprite, width);
+}
+
 @mixin {{spritesheet_name}}_sprite($sprite) {
   background-image: image_url('{{image_path}}');
   $__sprite: map-get($__{{spritesheet_name}}, $sprite);
-  width: map-get($__sprite, width);
-  height: map-get($__sprite, height);
+  width: {{spritesheet_name}}_sprite_width($sprite);
+  height: {{spritesheet_name}}_sprite_height($sprite);
 
   background-position: map-get($__sprite, x) map-get($__sprite, y);
 }
 
-@mixin {{spritesheet_name}}_sprite_height($sprite) {
-  $__sprite: map-get($__{{spritesheet_name}}, $sprite);
-  height: map-get($__sprite, height);
-}
-
-@mixin {{spritesheet_name}}_sprite_width($sprite) {
-  $__sprite: map-get($__{{spritesheet_name}}, $sprite);
-  width: map-get($__sprite, width);
-}
