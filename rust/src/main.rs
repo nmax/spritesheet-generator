@@ -1,12 +1,14 @@
 mod bounding_rect;
 mod errors;
 mod importer;
+mod placement_strategy;
 mod size;
 mod sprite;
 mod sprite_sheet;
 mod template_generator;
 
 use sprite_sheet::SpriteSheet;
+use placement_strategy::PlacementStrategy;
 
 extern crate clap;
 use clap::{Arg, App, ArgMatches};
@@ -16,7 +18,7 @@ fn optional_with_default(matches: &ArgMatches,
                          default: &str)
                          -> String {
   matches.value_of(input)
-    .map(|s| String::from(s))
+    .map(String::from)
     .unwrap_or(String::from(default))
 }
 
@@ -49,6 +51,13 @@ fn main() {
              and the like.")
       .required(false)
       .takes_value(true))
+    .arg(Arg::with_name("strategy")
+      .long("strategy")
+      .short("s")
+      .help("Sets the name of the spritesheet. This affects the SASS Mixins \
+             and the like.")
+      .required(false)
+      .takes_value(true))
     .arg(Arg::with_name("verbose")
       .short("v")
       .help("Be more vocal about whats happening")
@@ -61,26 +70,32 @@ fn main() {
   let out_scss =
     optional_with_default(&matches, "output_scss", "spritesheet.scss");
   let name = optional_with_default(&matches, "name", "spritesheet");
+  let strategy = match matches.value_of("strategy") {
+    Some("vertical") => PlacementStrategy::StackedVertical,
+    Some("horizontal") => PlacementStrategy::StackedHorizontal,
+    Some("pack") => PlacementStrategy::Packed,
+    _ => panic!("wtf"),
+  };
 
+  println!("{:?}", strategy);
 
   // unwrap ist hier sicher weil "input" ein required-Attribut ist
   let files: Vec<&str> = matches.values_of("input").unwrap().collect();
   let be_verbose = matches.value_of("verbose").is_some();
 
-  // TODO: Mehr benutzen / Richtigen Logger benutzen
-  if be_verbose {
-    println!("[rust] outpng={:?}", out_png);
-    println!("[rust] outscss={:?}", out_scss);
-    println!("[rust] files={:?}", files);
-  }
+  // // TODO: Mehr benutzen / Richtigen Logger benutzen
+  // if be_verbose {
+  //   println!("[rust] outpng={:?}", out_png);
+  //   println!("[rust] outscss={:?}", out_scss);
+  //   println!("[rust] files={:?}", files);
+  // }
 
   let sprites = importer::load_files(files).unwrap_or_else(|error| {
     println!("{}", error);
     std::process::exit(1)
   });
 
-  let sheet = SpriteSheet::new(sprites, &name, be_verbose);
-
+  let sheet = SpriteSheet::new(sprites, &name, strategy, be_verbose);
   match sheet.save(out_png, out_scss) {
     Err(err) => println!("{}", err),
     Ok(()) => (),

@@ -5,26 +5,36 @@ use std::path::{Path, PathBuf};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
-use self::image::{GenericImage, DynamicImage};
+use self::image::{DynamicImage, GenericImage};
 use self::rustc_serialize::json::{Json, ToJson};
 use size::Size;
 use errors::SpriteSheetError;
 use bounding_rect::BoundingRect;
 
-#[derive(Clone)]
 pub struct Sprite {
-  path: PathBuf,
   pub buffer: DynamicImage,
-  bounds: Option<BoundingRect>,
+  path: PathBuf,
 }
 
-impl ToJson for Sprite {
+pub struct PlacedSprite {
+  pub sprite: Sprite,
+  pub position: BoundingRect,
+}
+
+impl PlacedSprite {
+  pub fn new(sprite: Sprite, position: BoundingRect) -> Self {
+    PlacedSprite {
+      sprite: sprite,
+      position: position,
+    }
+  }
+}
+
+impl ToJson for PlacedSprite {
   fn to_json(&self) -> Json {
     let mut m: BTreeMap<String, Json> = BTreeMap::new();
-    if let Some(bounds) = self.bounds.clone() {
-      m.insert("bounds".to_owned(), bounds.to_json());
-    }
-    m.insert("name".to_owned(), self.css_class_name().to_json());
+    m.insert("bounds".to_owned(), self.position.to_json());
+    m.insert("name".to_owned(), self.sprite.css_class_name().to_json());
     m.to_json()
   }
 }
@@ -45,7 +55,16 @@ impl PartialOrd for Sprite {
 
 impl Ord for Sprite {
   fn cmp(&self, other: &Self) -> Ordering {
-    self.path.cmp(&other.path)
+    let self_width = self.dimensions().0;
+    let other_width = other.dimensions().0;
+
+    if self_width == other_width {
+      Ordering::Equal
+    } else if self_width < other_width {
+      Ordering::Greater
+    } else {
+      Ordering::Less
+    }
   }
 }
 
@@ -56,7 +75,6 @@ impl Sprite {
     Ok(Sprite {
       path: path.to_path_buf(),
       buffer: image,
-      bounds: None,
     })
   }
 
@@ -64,16 +82,12 @@ impl Sprite {
     self.buffer.dimensions()
   }
 
-  pub fn add_bounds(&mut self, bounds: BoundingRect) {
-    self.bounds = Some(bounds);
-  }
-
   // TODO: Das sollte vermutlich "-> Result<String, SpritesheetError>" werden.
   pub fn css_class_name(&self) -> String {
     self.path
       .file_stem()
       .and_then(|os_str| os_str.to_str())
-      .map(|s| s.to_lowercase().replace(" ", "_"))
+      .map(|s| s.to_lowercase().replace(" ", "_").replace("'", "_"))
       .unwrap_or(String::from("unkown_class_name"))
   }
 }

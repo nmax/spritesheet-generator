@@ -3,6 +3,8 @@ extern crate rustc_serialize;
 use self::rustc_serialize::json::{Json, ToJson};
 use std::collections::BTreeMap;
 
+use size::*;
+
 #[derive(Clone, Debug)]
 pub struct BoundingRect {
   pub x: u32,

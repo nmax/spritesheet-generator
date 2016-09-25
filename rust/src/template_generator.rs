@@ -18,13 +18,16 @@ pub fn render_scss<P: AsRef<Path>>(sheet: &SpriteSheet,
 
   let mut image_path_map: BTreeMap<String, Json> = BTreeMap::new();
 
-  let relative_path = &out_img.as_ref()
-    .iter()
-    .skip_while(|segment| segment.to_str().unwrap() != "images")
-    .skip(1)
-    .fold(String::new(), |relative_path, segment| {
-      relative_path + "/" + segment.to_str().unwrap()
-    })[1..];
+  // TODO: Das ist Bullshit. Man sollte vermutlich den relativen Pfad zwischen
+  // SCSS-Out und Img-Out ermitteln.
+  // let relative_path = &out_img.as_ref()
+  //   .iter()
+  //   .skip_while(|segment| segment.to_str().unwrap() != "images")
+  //   .skip(1)
+  //   .fold(String::new(), |relative_path, segment| {
+  //     relative_path + "/" + segment.to_str().unwrap()
+  //   })[1..];
+  let relative_path = "./";
 
 
   // TODO: WTF! Geht das nicht ein _bisschen_ einfacher?
@@ -34,7 +37,7 @@ pub fn render_scss<P: AsRef<Path>>(sheet: &SpriteSheet,
 
   let mut out_file = try!(File::create(out_file));
 
-  println!("sheet written to {:?}, ARGS: {:?}", out_file, &data);
+  // println!("sheet written to {:?}, ARGS: {:?}", out_file, &data);
 
   try!(handlebars.template_renderw(template, &data, &mut out_file));
   Ok(())
