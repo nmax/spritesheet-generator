@@ -6,7 +6,8 @@ authors = ["Maximilian Neger <maximilian.neger@gmail.com>"]
 [dependencies]
 toml = "0.1.30"
 clippy = "0.0.91"
-clap = "2.9.2"
+clap = "2.10.4"
 image = "0.10.3"
 handlebars = "0.18.1"
 rustc-serialize = "0.3.19"
+oxipng = "0.11.0"

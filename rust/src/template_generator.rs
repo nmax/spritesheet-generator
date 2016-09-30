@@ -20,14 +20,14 @@ pub fn render_scss<P: AsRef<Path>>(sheet: &SpriteSheet,
 
   // TODO: Das ist Bullshit. Man sollte vermutlich den relativen Pfad zwischen
   // SCSS-Out und Img-Out ermitteln.
-  // let relative_path = &out_img.as_ref()
-  //   .iter()
-  //   .skip_while(|segment| segment.to_str().unwrap() != "images")
-  //   .skip(1)
-  //   .fold(String::new(), |relative_path, segment| {
-  //     relative_path + "/" + segment.to_str().unwrap()
-  //   })[1..];
-  let relative_path = "./";
+  let relative_path = &out_img.as_ref()
+    .iter()
+    .skip_while(|segment| segment.to_str().unwrap() != "images")
+    .skip(1)
+    .fold(String::new(), |relative_path, segment| {
+      relative_path + "/" + segment.to_str().unwrap()
+    })[1..];
+  // let relative_path = "./";
 
 
   // TODO: WTF! Geht das nicht ein _bisschen_ einfacher?
