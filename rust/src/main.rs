@@ -74,7 +74,7 @@ fn main() {
     Some("vertical") => PlacementStrategy::StackedVertical,
     Some("horizontal") => PlacementStrategy::StackedHorizontal,
     Some("pack") => PlacementStrategy::Packed,
-    _ => panic!("wtf"),
+    _ => PlacementStrategy::Packed,
   };
 
   println!("{:?}", strategy);
