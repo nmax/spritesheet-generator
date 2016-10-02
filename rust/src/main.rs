@@ -6,6 +6,7 @@ mod size;
 mod sprite;
 mod sprite_sheet;
 mod template_generator;
+mod optimization;
 
 use sprite_sheet::SpriteSheet;
 use placement_strategy::PlacementStrategy;

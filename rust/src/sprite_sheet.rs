@@ -1,11 +1,8 @@
 extern crate image;
 extern crate rustc_serialize;
-extern crate oxipng;
 
-use self::image::{GenericImage, DynamicImage};
+use self::image::DynamicImage;
 use self::rustc_serialize::json::{Json, ToJson};
-
-use self::oxipng::{Options as OxiOptions, optimize};
 
 use std::path::Path;
 use std::fs::File;
@@ -16,6 +13,7 @@ use errors::SpriteSheetError;
 use template_generator;
 use placement_strategy::*;
 use sprite::*;
+use optimization::optimize;
 
 pub struct SpriteSheet {
   name: String,
@@ -45,44 +43,12 @@ impl SpriteSheet {
                               -> Result<(), SpriteSheetError> {
     try!(template_generator::render_scss(&self, &out_scss, &out_png));
 
-
-    let (width, height) = self.canvas.dimensions();
-    // let pixels = self.canvas.raw_pixels();
-    // let options = OxiOptions {
-    //   backup: false,
-    //   out_file: Path::new(&out_png),
-    //   out_dir: None,
-    //   stdout: false,
-    //   fix_errors: false,
-    //   pretend: false,
-    //   recursive: false,
-    //   clobber: true,
-    //   create: false,
-    //   force: false,
-    //   preserve_attrs: false,
-    //   verbosity: Some(1),
-    //     // filter: HashSet<u8>,
-    //     interlace: None
-    //     // compression: HashSet<u8>,
-    //     // memory: HashSet<u8>,
-    //     // strategies: HashSet<u8>,
-    //     window: 15u8,
-    //     bit_depth_reduction: true,
-    //     color_type_reduction: true,
-    //     palette_reduction: true,
-    //     idat_recoding: true,
-    //     strip: None,
-    //     use_heuristics: false,
-    //     threads: 2
-    // };
-
-
     let mut buffer = try!(File::create(&out_png));
     try!(self.canvas.save(&mut buffer, image::ImageFormat::PNG));
-    match optimize(Path::new(out_png.as_ref()), &OxiOptions::default()) {
-      Ok(()) => Ok(()),
-      Err(e) => panic!(e),
-    }
+
+    optimize(out_png);
+
+    Ok(())
   }
 
   pub fn data(&self) -> Json {
