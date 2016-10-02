@@ -1,7 +1,6 @@
 extern crate image;
 extern crate handlebars;
 
-
 use std::io;
 use std::fmt;
 use std::error;
@@ -42,8 +41,6 @@ impl error::Error for SpriteSheetError {
     }
   }
 }
-
-
 
 impl From<image::ImageError> for SpriteSheetError {
   fn from(err: image::ImageError) -> SpriteSheetError {

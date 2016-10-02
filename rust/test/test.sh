@@ -1,3 +1,5 @@
+#!/bin/sh
+
 rm spritesheet.png
 rm spritesheet.css
 cargo build --release
