@@ -8,25 +8,24 @@ mod sprite_sheet;
 mod template_generator;
 mod optimization;
 
+use sprite::Sprite;
 use sprite_sheet::SpriteSheet;
 use placement_strategy::PlacementStrategy;
 
+#[macro_use]
 extern crate clap;
-use clap::{Arg, App, ArgMatches};
+use clap::{Arg, App};
 
-fn optional_with_default(matches: &ArgMatches,
-                         input: &str,
-                         default: &str)
-                         -> String {
-  matches.value_of(input)
-    .map(String::from)
-    .unwrap_or(String::from(default))
+struct Arguments {
+  sprites: Vec<Sprite>,
+  name: String,
+  out_png: String,
+  out_scss: String,
+  strategy: PlacementStrategy,
+  verbosity: Option<u8>,
 }
 
-// TODO: Verbose Flag mit Logging
-// TODO: Args als Enums/Static Strings?
-// TODO: Config als Toml File?
-fn main() {
+fn parse_args() -> Arguments {
   let matches = App::new("SpriteSheetGenerator")
     .version("1.0")
     .author("Maximilian Neger <maximilian.neger@nix-wie-wg.de>")
@@ -66,23 +65,33 @@ fn main() {
       .takes_value(false))
     .get_matches();
 
-  let out_png =
-    optional_with_default(&matches, "output_img", "spritesheet.png");
-  let out_scss =
-    optional_with_default(&matches, "output_scss", "spritesheet.scss");
-  let name = optional_with_default(&matches, "name", "spritesheet");
-  let strategy = match matches.value_of("strategy") {
-    Some("vertical") => PlacementStrategy::StackedVertical,
-    Some("horizontal") => PlacementStrategy::StackedHorizontal,
-    Some("pack") => PlacementStrategy::Packed,
-    _ => PlacementStrategy::Packed,
-  };
+  Arguments {
+    name: value_t!(matches, "name", String).unwrap_or(format!("spritesheet")),
+    sprites: values_t!(matches, "input", Sprite).unwrap(),
+    out_scss: value_t!(matches, "output_scss", String)
+      .unwrap_or(format!("spritesheet.scss")),
+    out_png: value_t!(matches, "output_img", String)
+      .unwrap_or(format!("spritesheet.png")),
 
-  println!("{:?}", strategy);
+    strategy: match matches.value_of("strategy") {
+      Some("vertical") => PlacementStrategy::StackedVertical,
+      Some("horizontal") => PlacementStrategy::StackedHorizontal,
+      Some("pack") => PlacementStrategy::Packed,
+      _ => PlacementStrategy::Packed,
+    },
+    verbosity: match matches.occurrences_of("v") {
+      0 => None,
+      1 => Some(1),
+      2 => Some(2),
+      _ => Some(2),
+    },
+  }
+}
 
-  // unwrap ist hier sicher weil "input" ein required-Attribut ist
-  let files: Vec<&str> = matches.values_of("input").unwrap().collect();
-  let be_verbose = matches.value_of("verbose").is_some();
+// TODO: Verbose Flag mit Logging
+// TODO: Config als Toml File?
+pub fn main() {
+  let arguments = parse_args();
 
   // // TODO: Mehr benutzen / Richtigen Logger benutzen
   // if be_verbose {
@@ -91,13 +100,12 @@ fn main() {
   //   println!("[rust] files={:?}", files);
   // }
 
-  let sprites = importer::load_files(files).unwrap_or_else(|error| {
-    println!("{}", error);
-    std::process::exit(1)
-  });
+  let sheet = SpriteSheet::new(arguments.sprites,
+                               &arguments.name,
+                               arguments.strategy,
+                               arguments.verbosity);
 
-  let sheet = SpriteSheet::new(sprites, &name, strategy, be_verbose);
-  match sheet.save(out_png, out_scss) {
+  match sheet.save(arguments.out_png, arguments.out_scss) {
     Err(err) => println!("{}", err),
     Ok(()) => (),
   }

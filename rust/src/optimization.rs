@@ -19,9 +19,7 @@ pub fn optimize<P: AsRef<Path>>(img_path: P) {
 // https://shssoichiro.github.io/oxipng/doc/oxipng/struct.Options.html
 fn oxi_options(out_png: PathBuf) -> OxiOptions {
   let mut compression = HashSet::new();
-  for i in 4..10 {
-    compression.insert(i);
-  }
+  compression.insert(9);
 
   let mut strategies = HashSet::new();
   for i in 0..4 {

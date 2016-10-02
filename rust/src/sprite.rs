@@ -4,6 +4,7 @@ extern crate rustc_serialize;
 use std::path::{Path, PathBuf};
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
+use std::str::FromStr;
 
 use self::image::{DynamicImage, GenericImage};
 use self::rustc_serialize::json::{Json, ToJson};
@@ -39,6 +40,19 @@ impl ToJson for PlacedSprite {
   }
 }
 
+impl FromStr for Sprite {
+  type Err = SpriteSheetError;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    let image = try!(image::open(&s));
+
+    Ok(Sprite {
+      path: Path::new(s).to_path_buf(),
+      buffer: image,
+    })
+  }
+}
+
 impl PartialEq for Sprite {
   fn eq(&self, other: &Self) -> bool {
     self.path.eq(&other.path)
@@ -69,15 +83,6 @@ impl Ord for Sprite {
 }
 
 impl Sprite {
-  pub fn new(path: &Path) -> Result<Sprite, SpriteSheetError> {
-    let image = try!(image::open(&path));
-
-    Ok(Sprite {
-      path: path.to_path_buf(),
-      buffer: image,
-    })
-  }
-
   pub fn dimensions(&self) -> Size {
     self.buffer.dimensions()
   }

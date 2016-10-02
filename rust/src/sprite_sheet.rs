@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 
 use errors::SpriteSheetError;
 
-use template_generator;
+use template_generator::render_scss;
 use placement_strategy::*;
 use sprite::*;
 use optimization::optimize;
@@ -25,7 +25,7 @@ impl SpriteSheet {
   pub fn new(sprites: Vec<Sprite>,
              name: &str,
              strategy: PlacementStrategy,
-             be_verbose: bool)
+             verbosity: Option<u8>)
              -> Self {
 
     let (canvas, placed_sprites) = strategy.place_sprites(sprites);
@@ -41,7 +41,7 @@ impl SpriteSheet {
                               out_png: P,
                               out_scss: P)
                               -> Result<(), SpriteSheetError> {
-    try!(template_generator::render_scss(&self, &out_scss, &out_png));
+    try!(render_scss(&self, &out_scss, &out_png));
 
     let mut buffer = try!(File::create(&out_png));
     try!(self.canvas.save(&mut buffer, image::ImageFormat::PNG));
