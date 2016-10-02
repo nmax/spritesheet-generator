@@ -1,12 +1,10 @@
 mod bounding_rect;
 mod errors;
-mod importer;
+mod optimization;
 mod placement_strategy;
 mod size;
 mod sprite;
 mod sprite_sheet;
-mod template_generator;
-mod optimization;
 
 use sprite::Sprite;
 use sprite_sheet::SpriteSheet;
@@ -90,7 +88,7 @@ fn parse_args() -> Arguments {
 
 // TODO: Verbose Flag mit Logging
 // TODO: Config als Toml File?
-pub fn main() {
+fn main() {
   let arguments = parse_args();
 
   // // TODO: Mehr benutzen / Richtigen Logger benutzen

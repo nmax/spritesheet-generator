@@ -6,11 +6,10 @@ use self::oxipng::headers::Headers;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
-pub fn optimize<P: AsRef<Path>>(img_path: P) {
-  let out = Path::new(img_path.as_ref());
-  let opts = oxi_options(PathBuf::from(out));
+pub fn optimize(img_path: &Path) {
+  let opts = oxi_options(img_path.to_path_buf());
 
-  match oxi_optimize(&out, &opts) {
+  match oxi_optimize(img_path, &opts) {
     Ok(()) => (),
     Err(e) => println!("{}", e),
   }
