@@ -6,6 +6,9 @@ use self::oxipng::headers::Headers;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
+extern crate log;
+use log::{max_log_level, LogLevelFilter};
+
 pub fn optimize(img_path: &Path) {
   let opts = oxi_options(img_path.to_path_buf());
 
@@ -35,6 +38,13 @@ fn oxi_options(out_png: PathBuf) -> OxiOptions {
     memory.insert(i);
   }
 
+  let verbosity: Option<u8> = match max_log_level() {
+    LogLevelFilter::Error => None,
+    LogLevelFilter::Info => Some(2),
+    LogLevelFilter::Debug => Some(1),
+    _ => None,
+  };
+
   OxiOptions {
     backup: false,
     out_file: out_png,
@@ -47,7 +57,7 @@ fn oxi_options(out_png: PathBuf) -> OxiOptions {
     create: false,
     force: false,
     preserve_attrs: false,
-    verbosity: Some(2),
+    verbosity: verbosity,
     filter: filter,
     interlace: None,
     compression: compression,

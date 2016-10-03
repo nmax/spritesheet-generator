@@ -11,6 +11,12 @@ use sprite_sheet::SpriteSheet;
 use placement_strategy::PlacementStrategy;
 
 #[macro_use]
+extern crate log;
+extern crate simplelog;
+
+use simplelog::{SimpleLogger, LogLevelFilter};
+
+#[macro_use]
 extern crate clap;
 use clap::{Arg, App};
 
@@ -20,7 +26,6 @@ struct Arguments {
   out_png: String,
   out_scss: String,
   strategy: PlacementStrategy,
-  verbosity: Option<u8>,
 }
 
 fn parse_args() -> Arguments {
@@ -57,11 +62,18 @@ fn parse_args() -> Arguments {
       .required(false)
       .takes_value(true))
     .arg(Arg::with_name("verbose")
+      .multiple(true)
       .short("v")
+      .long("verbose")
       .help("Be more vocal about whats happening")
-      .required(false)
-      .takes_value(false))
+      .required(false))
     .get_matches();
+
+  let _ = match matches.occurrences_of("verbose") {
+    0 => SimpleLogger::init(LogLevelFilter::Error),
+    1 => SimpleLogger::init(LogLevelFilter::Info),
+    2 | _ => SimpleLogger::init(LogLevelFilter::Debug),
+  };
 
   Arguments {
     name: value_t!(matches, "name", String).unwrap_or(format!("spritesheet")),
@@ -74,34 +86,22 @@ fn parse_args() -> Arguments {
     strategy: match matches.value_of("strategy") {
       Some("vertical") => PlacementStrategy::StackedVertical,
       Some("horizontal") => PlacementStrategy::StackedHorizontal,
-      Some("pack") => PlacementStrategy::Packed,
-      _ => PlacementStrategy::Packed,
-    },
-    verbosity: match matches.occurrences_of("v") {
-      0 => None,
-      1 => Some(1),
-      2 => Some(2),
-      _ => Some(2),
+      Some("pack") | _ => PlacementStrategy::Packed,
     },
   }
 }
 
-// TODO: Verbose Flag mit Logging
 // TODO: Config als Toml File?
 fn main() {
   let arguments = parse_args();
 
-  // // TODO: Mehr benutzen / Richtigen Logger benutzen
-  // if be_verbose {
-  //   println!("[rust] outpng={:?}", out_png);
-  //   println!("[rust] outscss={:?}", out_scss);
-  //   println!("[rust] files={:?}", files);
-  // }
+  debug!("Name: {}", arguments.name);
+  debug!("Strategy: {:?}", arguments.strategy);
+  debug!("PNG out: {}", arguments.out_png);
+  debug!("SCSS out: {}", arguments.out_scss);
 
-  let sheet = SpriteSheet::new(arguments.sprites,
-                               &arguments.name,
-                               arguments.strategy,
-                               arguments.verbosity);
+  let sheet =
+    SpriteSheet::new(arguments.sprites, &arguments.name, arguments.strategy);
 
   match sheet.save(arguments.out_png, arguments.out_scss) {
     Err(err) => println!("{}", err),

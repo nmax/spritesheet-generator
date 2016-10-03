@@ -25,7 +25,9 @@ impl PlacementStrategy {
     let (width, height) = find_canvas_constraints(&placed_sprites);
     assert!(width > 0);
     assert!(height > 0);
-    println!("Canvas size: {}x{}", width, height);
+
+    info!("Size: {}x{}", width, height);
+
     let mut canvas = DynamicImage::new_rgba8(width, height);
 
     for sprite in &placed_sprites {
@@ -36,16 +38,15 @@ impl PlacementStrategy {
   }
 }
 
-fn render_sprite(psprite: &PlacedSprite, buffer: &mut DynamicImage) {
+fn render_sprite(p_sprite: &PlacedSprite, buffer: &mut DynamicImage) {
   let mut sub_image = imageops::crop(buffer,
-                                     psprite.position.x,
-                                     psprite.position.y,
-                                     psprite.position.width,
-                                     psprite.position.height);
-  sub_image.copy_from(&psprite.sprite.buffer, 0, 0);
+                                     p_sprite.position.x,
+                                     p_sprite.position.y,
+                                     p_sprite.position.width,
+                                     p_sprite.position.height);
+  sub_image.copy_from(&p_sprite.sprite.buffer, 0, 0);
 }
 
-// TODO: Das sollte sich allgemeiner implementieren lassen.
 fn find_canvas_constraints(placed_sprites: &Vec<PlacedSprite>) -> Size {
   placed_sprites.into_iter()
     .fold((0, 0), |size, sprite| {
@@ -73,33 +74,35 @@ fn pack(mut sprites: Vec<Sprite>) -> Vec<PlacedSprite> {
     .enumerate()
     .map(|(n, sprite)| {
       let size = sprite.dimensions();
+      // Das erste Sprite geht über gesamt Breite
       if n == 0 {
         let bounds = BoundingRect::new(0, 0, size.0, size.1);
         y_offset = bounds.height;
         PlacedSprite::new(sprite, bounds)
       } else {
-
-        // Append right
+        // In der aktuellen Zeile ist rechts noch Platz
         if x_offset + size.0 < max_width {
+
+          // Die aktuelle Zeile ist immer so groß wie das höchste Sprite darin
           if size.1 > row_height {
             row_height = size.1;
           }
 
           let bounds = BoundingRect::new(x_offset, y_offset, size.0, size.1);
-          x_offset = x_offset + size.0;
+          x_offset += size.0;
           PlacedSprite::new(sprite, bounds)
+
         } else {
-          // begin new row
+          // In der aktuellen Zeile ist kein Platz mehr; neue Zeile anfangen
           x_offset = 0;
+          y_offset += row_height;
 
-          // move down the length of the previous lines tallest sprite
-          y_offset = y_offset + row_height;
-
-          // reset the line height to the current sprites 'height
+          // Zeilenhöhe zurücksetzen auf die Höhe des ersten Sprites in der
+          // Zeile
           row_height = size.1;
 
           let bounds = BoundingRect::new(x_offset, y_offset, size.0, size.1);
-          x_offset = x_offset + size.0;
+          x_offset += size.0;
           PlacedSprite::new(sprite, bounds)
         }
       }

@@ -26,8 +26,7 @@ pub struct SpriteSheet {
 impl SpriteSheet {
   pub fn new(sprites: Vec<Sprite>,
              name: &str,
-             strategy: PlacementStrategy,
-             verbosity: Option<u8>)
+             strategy: PlacementStrategy)
              -> Self {
 
     let (canvas, placed_sprites) = strategy.place_sprites(sprites);
@@ -51,7 +50,7 @@ impl SpriteSheet {
     let mut buffer = try!(File::create(out_png));
     try!(self.canvas.save(&mut buffer, image::ImageFormat::PNG));
 
-    optimize(out_png);
+    // optimize(out_png);
 
     Ok(())
   }
@@ -67,12 +66,12 @@ impl SpriteSheet {
 
     // TODO: Das ist Bullshit. Man sollte vermutlich den relativen Pfad zwischen
     // SCSS-Out und Img-Out ermitteln.
-    let relative_path = &out_img.iter()
-      .skip_while(|segment| segment.to_str().unwrap() != "images")
-      .skip(1)
-      .fold(String::new(), |relative_path, segment| {
-        relative_path + "/" + segment.to_str().unwrap()
-      })[1..];
+    // let relative_path = &out_img.iter()
+    //   .skip_while(|segment| segment.to_str().unwrap() != "images")
+    //   .skip(1)
+    //   .fold(String::new(), |relative_path, segment| {
+    //     relative_path + "/" + segment.to_str().unwrap()
+    //   })[1..];
     let relative_path = "./";
 
 
