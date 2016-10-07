@@ -11,30 +11,16 @@ use std::collections::BTreeMap;
 
 pub fn render_scss<P: AsRef<Path>>(sheet: &SpriteSheet,
                                    out_file: P,
-                                   out_img: P)
+                                   scss_img_url: P)
                                    -> Result<(), SpriteSheetError> {
   let handlebars = Handlebars::new();
   let template = include_str!("../template.hbs");
 
   let mut image_path_map: BTreeMap<String, Json> = BTreeMap::new();
-
-  // TODO: Das ist Bullshit. Man sollte vermutlich den relativen Pfad zwischen
-  // SCSS-Out und Img-Out ermitteln.
-  // let relative_path = &out_img.as_ref()
-  //   .iter()
-  //   .skip_while(|segment| segment.to_str().unwrap() != "images")
-  //   .skip(1)
-  //   .fold(String::new(), |relative_path, segment| {
-  //     relative_path + "/" + segment.to_str().unwrap()
-  //   })[1..];
-  let relative_path = "./";
-
-
-  // TODO: WTF! Geht das nicht ein _bisschen_ einfacher?
-  image_path_map.insert("image_path".to_owned(), relative_path.to_json());
+  let scss_img_url = scss_img_url.as_ref().to_str().unwrap();
+  image_path_map.insert("image_path".to_owned(), scss_img_url.to_json());
 
   let data = Context::wraps(&sheet.data()).extend(&image_path_map);
-
   let mut out_file = try!(File::create(out_file));
 
   // println!("sheet written to {:?}, ARGS: {:?}", out_file, &data);

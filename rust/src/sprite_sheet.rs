@@ -38,9 +38,10 @@ impl SpriteSheet {
 
   pub fn save<P: AsRef<Path>>(&self,
                               out_png: P,
-                              out_scss: P)
+                              out_scss: P,
+                              scss_img_url: P)
                               -> Result<(), SpriteSheetError> {
-    try!(template_generator::render_scss(&self, &out_scss, &out_png));
+    try!(template_generator::render_scss(&self, &out_scss, &scss_img_url));
 
     let mut buffer = try!(File::create(&out_png));
     try!(self.canvas.save(&mut buffer, image::ImageFormat::PNG));

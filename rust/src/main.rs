@@ -39,6 +39,11 @@ fn main() {
       .help("Sets the output scss file to use")
       .required(false)
       .takes_value(true))
+    .arg(Arg::with_name("scss_img_url")
+      .long("scss-img-url")
+      .help("Sets the image_url to use inside the generated scss file")
+      .required(false)
+      .takes_value(true))
     .arg(Arg::with_name("output_img")
       .long("image-out")
       .help("Sets the output spritesheet file to use")
@@ -70,6 +75,7 @@ fn main() {
   let out_scss =
     optional_with_default(&matches, "output_scss", "spritesheet.scss");
   let name = optional_with_default(&matches, "name", "spritesheet");
+  let scss_img_url = optional_with_default(&matches, "scss_img_url", "./");
   let strategy = match matches.value_of("strategy") {
     Some("vertical") => PlacementStrategy::StackedVertical,
     Some("horizontal") => PlacementStrategy::StackedHorizontal,
@@ -96,7 +102,7 @@ fn main() {
   });
 
   let sheet = SpriteSheet::new(sprites, &name, strategy, be_verbose);
-  match sheet.save(out_png, out_scss) {
+  match sheet.save(out_png, out_scss, scss_img_url) {
     Err(err) => println!("{}", err),
     Ok(()) => (),
   }
