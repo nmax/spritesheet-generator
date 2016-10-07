@@ -25,6 +25,7 @@ struct Arguments {
   name: String,
   out_png: String,
   out_scss: String,
+  scss_img_url: String,
   strategy: PlacementStrategy,
 }
 
@@ -40,6 +41,11 @@ fn parse_args() -> Arguments {
     .arg(Arg::with_name("output_scss")
       .long("scss-out")
       .help("Sets the output scss file to use")
+      .required(false)
+      .takes_value(true))
+    .arg(Arg::with_name("scss_img_url")
+      .long("scss-img-url")
+      .help("Sets the image_url to use inside the generated scss file")
       .required(false)
       .takes_value(true))
     .arg(Arg::with_name("output_img")
@@ -77,6 +83,8 @@ fn parse_args() -> Arguments {
 
   Arguments {
     name: value_t!(matches, "name", String).unwrap_or(format!("spritesheet")),
+    scss_img_url: value_t!(matches, "scss_img_url", String)
+      .unwrap_or(format!("./")),
     sprites: values_t!(matches, "input", Sprite).unwrap(),
     out_scss: value_t!(matches, "output_scss", String)
       .unwrap_or(format!("spritesheet.scss")),
@@ -103,7 +111,9 @@ fn main() {
   let sheet =
     SpriteSheet::new(arguments.sprites, &arguments.name, arguments.strategy);
 
-  match sheet.save(arguments.out_png, arguments.out_scss) {
+  match sheet.save(arguments.out_png,
+                   arguments.out_scss,
+                   arguments.scss_img_url) {
     Err(err) => println!("{}", err),
     Ok(()) => (),
   }
