@@ -47,7 +47,7 @@ fn render_sprite(p_sprite: &PlacedSprite, buffer: &mut DynamicImage) {
   sub_image.copy_from(&p_sprite.sprite.buffer, 0, 0);
 }
 
-fn find_canvas_constraints(placed_sprites: &Vec<PlacedSprite>) -> Size {
+fn find_canvas_constraints(placed_sprites: &[PlacedSprite]) -> Size {
   placed_sprites.into_iter()
     .fold((0, 0), |size, sprite| {
       let (mut x_end, mut y_end) = size;
@@ -79,32 +79,31 @@ fn pack(mut sprites: Vec<Sprite>) -> Vec<PlacedSprite> {
         let bounds = BoundingRect::new(0, 0, size.0, size.1);
         y_offset = bounds.height;
         PlacedSprite::new(sprite, bounds)
-      } else {
+
         // In der aktuellen Zeile ist rechts noch Platz
-        if x_offset + size.0 < max_width {
+      } else if x_offset + size.0 < max_width {
 
-          // Die aktuelle Zeile ist immer so groß wie das höchste Sprite darin
-          if size.1 > row_height {
-            row_height = size.1;
-          }
-
-          let bounds = BoundingRect::new(x_offset, y_offset, size.0, size.1);
-          x_offset += size.0;
-          PlacedSprite::new(sprite, bounds)
-
-        } else {
-          // In der aktuellen Zeile ist kein Platz mehr; neue Zeile anfangen
-          x_offset = 0;
-          y_offset += row_height;
-
-          // Zeilenhöhe zurücksetzen auf die Höhe des ersten Sprites in der
-          // Zeile
+        // Die aktuelle Zeile ist immer so groß wie das höchste Sprite darin
+        if size.1 > row_height {
           row_height = size.1;
-
-          let bounds = BoundingRect::new(x_offset, y_offset, size.0, size.1);
-          x_offset += size.0;
-          PlacedSprite::new(sprite, bounds)
         }
+
+        let bounds = BoundingRect::new(x_offset, y_offset, size.0, size.1);
+        x_offset += size.0;
+        PlacedSprite::new(sprite, bounds)
+
+      } else {
+        // In der aktuellen Zeile ist kein Platz mehr; neue Zeile anfangen
+        x_offset = 0;
+        y_offset += row_height;
+
+        // Zeilenhöhe zurücksetzen auf die Höhe des ersten Sprites in der
+        // Zeile
+        row_height = size.1;
+
+        let bounds = BoundingRect::new(x_offset, y_offset, size.0, size.1);
+        x_offset += size.0;
+        PlacedSprite::new(sprite, bounds)
       }
     })
     .collect()

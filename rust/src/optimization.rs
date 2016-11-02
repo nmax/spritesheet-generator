@@ -39,7 +39,6 @@ fn oxi_options(out_png: PathBuf) -> OxiOptions {
   }
 
   let verbosity: Option<u8> = match max_log_level() {
-    LogLevelFilter::Error => None,
     LogLevelFilter::Info => Some(2),
     LogLevelFilter::Debug => Some(1),
     _ => None,

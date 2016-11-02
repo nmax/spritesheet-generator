@@ -1,3 +1,6 @@
+#![feature(plugin)]
+#![plugin(clippy)]
+
 mod bounding_rect;
 mod errors;
 mod optimization;
@@ -82,14 +85,15 @@ fn parse_args() -> Arguments {
   };
 
   Arguments {
-    name: value_t!(matches, "name", String).unwrap_or(format!("spritesheet")),
-    scss_img_url: value_t!(matches, "scss_img_url", String)
-      .unwrap_or(format!("./")),
+    name: value_t!(matches, "name", String).unwrap_or("spritesheet".to_owned()),
     sprites: values_t!(matches, "input", Sprite).unwrap(),
+
+    scss_img_url: value_t!(matches, "scss_img_url", String)
+      .unwrap_or("./".to_owned()),
     out_scss: value_t!(matches, "output_scss", String)
-      .unwrap_or(format!("spritesheet.scss")),
+      .unwrap_or("spritesheet.scss".to_owned()),
     out_png: value_t!(matches, "output_img", String)
-      .unwrap_or(format!("spritesheet.png")),
+      .unwrap_or("spritesheet.png".to_owned()),
 
     strategy: match matches.value_of("strategy") {
       Some("vertical") => PlacementStrategy::StackedVertical,

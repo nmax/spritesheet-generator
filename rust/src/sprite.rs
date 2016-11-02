@@ -93,6 +93,6 @@ impl Sprite {
       .file_stem()
       .and_then(|os_str| os_str.to_str())
       .map(|s| s.to_lowercase().replace(" ", "_").replace("'", "_"))
-      .unwrap_or(String::from("unkown_class_name"))
+      .unwrap_or_else(|| String::from("unkown_class_name"))
   }
 }
